@@ -1,8 +1,8 @@
 #!/bin/bash
 
 home_dir=`dirname $0`
-log="${home_dir}/cheching.log"
-lock_file="${home_dir}/cheching.lock"
+log="${home_dir}/checking.log"
+lock_file="${home_dir}/checking.lock"
 
 . ${home_dir}/function
 
@@ -21,7 +21,7 @@ echo -e "=== Start $0 ===\n`date`" >> ${log}
 if [ `tail -5 ${home_dir}/logfile.log | grep -c "already running"` -gt 4 ]; then
     echo WARNING >> ${log};
 
-    pid_file=`cat /home/ashilokhvostov/climate_control/lockfile.lock`
+    pid_file=`cat ${home_dir}/lockfile.lock`
     to_kill=`pstree -p ${pid_file} | sed 's/(/\n(/g' | grep '(' | sed 's/(\(.*\)).*/\1/' | tail -3 | sort -r | xargs`
     echo "Processes to kill: ${to_kill}" >> ${log}
     kill ${to_kill} >> ${log}
