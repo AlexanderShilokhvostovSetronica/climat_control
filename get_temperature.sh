@@ -74,6 +74,12 @@ for sensor in ${sensors[*]}; do
 
     num=`wcalc -q ${t}/1000`
 
+    correction=`grep ${sensor} ${aliases} | awk '{print $3}'`
+
+    if [[ -v correction ]]; then
+        num=`wcalc -q ${num}${correction}`
+    fi
+
     echo -e "Sensor: ${sensor}, Alias: ${alias}, Result value: ${num}" >> ${log}
     echo "${zabbix_host} ${alias} ${num}" >> ${batch_file}
 done
