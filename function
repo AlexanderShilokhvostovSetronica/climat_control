@@ -1,0 +1,7 @@
+function send_single_data() {
+    zabbix_sender -z 10.0.11.13 -s Lemaker -k $1 -o $2 2>&1 > /dev/null
+}
+
+function send_batch_data() {
+    zabbix_sender -z 10.0.11.13 -i $1 2>&1 >> ${log}
+}
