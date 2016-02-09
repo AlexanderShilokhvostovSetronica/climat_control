@@ -14,11 +14,11 @@ fi
 
 echo $$ > ${lock_file}
 
-trap "rm -f ${lock_file}; rm -f ${batch_file}; echo -e \"=== Stop $0 ===\n\" >> ${log}; exit" INT TERM EXIT
-
-echo -e "=== Start $0 ===\n`date`" >> ${log}
+trap "rm -f ${lock_file}; rm -f ${batch_file}; exit" INT TERM EXIT
 
 if [ `tail -5 ${home_dir}/logfile.log | grep -c "already running"` -gt 4 ]; then
+
+    echo -e "=== Start $0 ===\n`date`" >> ${log}
     echo WARNING >> ${log};
 
     pid_file=`cat ${home_dir}/lockfile.lock`
@@ -35,6 +35,4 @@ if [ `tail -5 ${home_dir}/logfile.log | grep -c "already running"` -gt 4 ]; then
                 echo -e "\tprocess ${proc} still alive" >> ${log}
             fi
     done
-else
-    echo "No sleeping processes, OK."
 fi
