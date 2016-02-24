@@ -32,7 +32,7 @@ if [ ! `which zabbix_sender` ]; then
     exit 2
 fi
 
-sensors=(`cat ${base_dir}/w1_bus_master1/w1_master_slaves | grep -v "not found"`)
+sensors=`for sensor in /sys/bus/w1/devices/28*; do basename ${sensor}; done`
 
 if [ ${#sensors[*]} -eq 0 ]; then
     echo "Sensors not found" >> ${log}
@@ -78,6 +78,11 @@ for sensor in ${sensors[*]}; do
 
     if [[ -v correction ]]; then
         num=`wcalc -q ${num}${correction}`
+    fi
+
+    if [ ${num%%.*} -le -20 -o ${num%%.*} -ge 40 ]; then
+        echo -e "Sensor: ${sensor}, Alias: ${alias}, Value: ${num}, not between -20 / +40, not push to zabbix" >> ${log}
+        break
     fi
 
     echo -e "Sensor: ${sensor}, Alias: ${alias}, Result value: ${num}" >> ${log}
