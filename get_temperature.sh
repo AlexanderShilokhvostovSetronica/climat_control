@@ -80,7 +80,7 @@ for sensor in ${sensors[*]}; do
         num=`wcalc -q ${num}${correction}`
     fi
 
-    if [ ${num%%.*} -le -20 -o ${num%%.*} -ge 40 ]; then
+    if [ ${num%%.*} -le -20 -o ${num%%.*} -ge 80 ]; then
         echo -e "Sensor: ${sensor}, Alias: ${alias}, Value: ${num}, not between -20 / +40, not push to zabbix" >> ${log}
         break
     fi

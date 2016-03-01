@@ -23,7 +23,7 @@ trap "rm -f ${lockfile}; echo -e \"=== Stop $0 ===\n\" >> ${log}; exit" INT TERM
 
 echo -e "=== Start $0 ===\n`date`" >> ${log}
 
-lynx -dump http://info.megafonsib.ru > ${dump_site}
+lynx -dump http://lk.megafon.ru > ${dump_site}
 
 #rest=`grep " Остаток " ${dump_site} | sed 's/^.* Остаток \(.*\) Мб .*$/\1/'`
 #used=`wcalc -q ${all_traff}-${rest}`
@@ -32,8 +32,12 @@ lynx -dump http://info.megafonsib.ru > ${dump_site}
 #echo "Internet trafic: used ${total} %" >> ${log}
 #send_data internet.trafic ${total}
 
-balance=`grep "Ваш баланс" ${dump_site} | sed 's/^.*баланс\(.*\) руб.*$/\1/'`
-echo "Balance: ${balance} rub" >> ${log}
-send_data ${zabbix_host} internet.balance ${balance}
+balance=`grep -i -A1 "баланс" ${dump_site} | xargs | sed 's/^.*аланс \(.*\) .*$/\1/;s/,/\./'`
+if [ ${#balance} -gt 0  ]; then
+    echo "Balance: ${balance} rub" >> ${log}
+    send_data ${zabbix_host} internet.balance ${balance}
+else
+    echo "No data found" >> ${log}
+fi
 
 rm -f ${dump_site}
