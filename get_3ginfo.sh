@@ -1,6 +1,9 @@
 #!/bin/bash
 
+set -x
+
 export LANG=en_US.UTF-8
+export WWW_HOME="http://lk.megafon.ru"
 
 home_dir=`dirname $0`
 log="${home_dir}/$0.log"
@@ -23,7 +26,7 @@ trap "rm -f ${lockfile}; echo -e \"=== Stop $0 ===\n\" >> ${log}; exit" INT TERM
 
 echo -e "=== Start $0 ===\n`date`" >> ${log}
 
-lynx -dump http://lk.megafon.ru > ${dump_site}
+lynx -dump ${WWW_HOME} > ${dump_site}
 
 #rest=`grep " Остаток " ${dump_site} | sed 's/^.* Остаток \(.*\) Мб .*$/\1/'`
 #used=`wcalc -q ${all_traff}-${rest}`
