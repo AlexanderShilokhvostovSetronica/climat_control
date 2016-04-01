@@ -4,7 +4,9 @@ home_dir=`dirname $0`
 log="${home_dir}/$0.log"
 lockfile="${home_dir}/$0.lock"
 zabbix_host="Morozovo"
-tmp_file="${home_dir}/ups_data"
+tmp_file=`mktemp`
+batch_file=`mktemp`
+
 upsc cyber 2>&1 > ${tmp_file} 2>&1
 
 . ${home_dir}/function
@@ -17,16 +19,22 @@ fi
 
 echo $$ > ${lockfile}
 
-trap "rm -f ${lockfile}; echo -e \"=== Stop $0 ===\n\" >> ${log}; exit" INT TERM EXIT
+trap "rm -f ${lockfile} ${tmp_file} ${batch_file}; echo -e \"=== Stop $0 ===\n\" >> ${log}; exit" INT TERM EXIT
 
 echo -e "=== Start $0 ===\n`date`" >> ${log}
 
 for point in battery.charge battery.voltage input.voltage output.voltage ups.load; do
 
     value=`grep "${point}:" ${tmp_file} | sed 's/^.*: //'`
-    echo "${point}: ${value}" >> ${log}
-    send_data ${zabbix_host} ${point} ${value}
+    if [ ${value} ]; then
+        echo "${point}: ${value}" >> ${log}
+        echo "${zabbix_host} ${point} ${value}" >> ${batch_file}
+    fi
 
 done
 
-rm -f ${tmp_file}
+if [ -s ${batch_file} ]; then  
+    send_batch_data ${batch_file}
+else
+    echo "No data to be sent" >> ${log}
+fi
