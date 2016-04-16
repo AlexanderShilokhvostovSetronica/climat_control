@@ -56,7 +56,7 @@ for sensor in ${sensors[*]}; do
         echo -e "Sensor: ${sensor}, Alias: ${alias}, Value: ${t}, count ${count}" >> ${log}
 
         if [ ${count} -eq ${timeout} ]; then
-            break
+            continue
         fi
 
         count=$(($count+1));
@@ -69,7 +69,7 @@ for sensor in ${sensors[*]}; do
 
     if [ ${t} -eq -125 -o ${t} -eq -62 -o ${t} -eq 85000 ]; then
         echo -e "Sensor: ${sensor}, Alias: ${alias}, Value: ${t}, after count ${count}, not push to zabbix" >> ${log}
-        break
+        continue
     fi
 
     num=`wcalc -q ${t}/1000`
@@ -81,8 +81,8 @@ for sensor in ${sensors[*]}; do
     fi
 
     if [ ${num%%.*} -le -20 -o ${num%%.*} -ge 80 ]; then
-        echo -e "Sensor: ${sensor}, Alias: ${alias}, Value: ${num}, not between -20 / +40, not push to zabbix" >> ${log}
-        break
+        echo -e "Sensor: ${sensor}, Alias: ${alias}, Value: ${num}, not between -20 / +80, not push to zabbix" >> ${log}
+        continue
     fi
 
     echo -e "Sensor: ${sensor}, Alias: ${alias}, Result value: ${num}" >> ${log}
