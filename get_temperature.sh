@@ -50,7 +50,7 @@ for sensor in ${sensors[*]}; do
 
     t=`cat ${base_dir}/${sensor}/w1_slave | grep "t=" | cut --delimiter== -f 2`
 
-    while [ ${t} -eq -62 -o ${t} -eq 85000 -o ${t} -eq -125 ]; do
+    while [ ${t} -eq -62 -o ${t} -eq 85000 -o ${t} -eq -125 -o ${t} -eq 1 -o ${t} -eq 1000 ]; do
 
         echo -e "Sensor: ${sensor}, Alias: ${alias}, Value: ${t}, count ${count}" >> ${log}
 
@@ -66,7 +66,7 @@ for sensor in ${sensors[*]}; do
 
     done
 
-    if [ ${t} -eq -62 -o ${t} -eq 85000 -o ${t} -eq -125 ]; then
+    if [ ${t} -eq -62 -o ${t} -eq 85000 -o ${t} -eq -125 -o ${t} -eq 1 -o ${t} -eq 1000 ]; then
         echo -e "Sensor: ${sensor}, Alias: ${alias}, Value: ${t}, after count ${count}, not push to zabbix" >> ${log}
         break
     fi
