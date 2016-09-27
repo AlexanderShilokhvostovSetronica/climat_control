@@ -50,14 +50,9 @@ for sensor in ${sensors[*]}; do
     timeout=3
 
     t=`cat ${base_dir}/${sensor}/w1_slave | grep "t=" | cut --delimiter== -f 2`
-
-    while [ ${t} -eq -125 -o ${t} -eq -62 -o ${t} -eq 85000 ]; do
+    while [ ${t} -eq -125 -o ${t} -eq -62 -o ${t} -eq 85000 ] && [ ${count} -ne ${timeout} ]; do
 
         echo -e "Sensor: ${sensor}, Alias: ${alias}, Value: ${t}, count ${count}" >> ${log}
-
-        if [ ${count} -eq ${timeout} ]; then
-            continue
-        fi
 
         count=$(($count+1));
 
