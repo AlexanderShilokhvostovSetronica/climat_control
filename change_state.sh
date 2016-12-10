@@ -6,8 +6,9 @@
 #echo -e '\x00' |dd of=output bs=1 count=1
 
 
-UP="/sys/bus/w1/devices/3a-00000027d55c/output"
+up_down="/sys/bus/w1/devices/3a-00000027d55c/output"
 hold="0.05"
+count=0
 
 # The temperature value to start heating
 # !!! CHANGE before run this script !!!
@@ -22,43 +23,53 @@ delta_time=`echo $((${end_time}-${now_time}))`
 
 time_sleep=$((${delta_time}/${delta_state}))
 
-function PUSH_UP {
-    echo -e '\x10' | dd of=${UP} bs=1 count=1
-## TODO
-#    while [ $? -ne 0 ]; do
-#        #  repeat
-#        echo -e '\x10' | dd of=${UP} bs=1 count=1
-#        sleep ${hold}
-#    done
-##
-    sleep ${hold}
-    echo -e '\x11' | dd of=${UP} bs=1 count=1
-## TODO
-#    while ! $?; do
-#        #  repeat
-#        echo -e '\x11' | dd of=${UP} bs=1 count=1
-#        sleep ${hold}
-#    done
-##
+function _click {
+
+    local _action=$1; shift
+    local _device=$1
+
+    let count+=1
+    echo -e "\x${_action}"| dd of=${_device} bs=1 count=1
+    while [ $? -ne 0 ]; do
+        sleep ${hold}
+        if [ $count -eq 5 ]; then echo "ERROR !"; exit 1; fi
+        _click $1
+    done
+
 }
+
+function UP {
+
+    _click 10 ${up_down}
+    _click 11 ${up_down}
+
+}
+
+function DOWN {
+
+    _click 01 ${up_down}
+    _click 11 ${up_down}
+
+}
+
 
 function MAKE_WARMER {
     for i in `seq 1 ${delta_state}`; do
         echo "[Info] Push the button 'UP'"
-        PUSH_UP #wakeup
+        UP #wakeup
         sleep 0.2
-        PUSH_UP #change state
+        UP #change state
         sleep ${time_sleep}
     done
 }
 
 function UP_ON_TWO {
 
-    PUSH_UP #wakeup
+    UP #wakeup
     sleep 0.2
-    PUSH_UP # up to 1 C
+    UP # up to 1 C
     sleep 0.2
-    PUSH_UP # up to 1 C
+    UP # up to 1 C
 
 }
 
