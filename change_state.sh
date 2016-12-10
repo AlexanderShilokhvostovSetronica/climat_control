@@ -11,21 +11,35 @@ hold="0.05"
 
 # The temperature value to start heating
 # !!! CHANGE before run this script !!!
-begine_state=12
+begine_state=15
 # The temperature value to stop heating
-end_state=25
+end_state=16
 delta_state=`echo $((${end_state}-${begine_state}))`
 
 now_time=`date +%s`
-end_time=`date -d"2016-11-12 14:00:00" +%s`
+end_time=`date -d"2016-12-10 13:00:00" +%s`
 delta_time=`echo $((${end_time}-${now_time}))`
 
 time_sleep=$((${delta_time}/${delta_state}))
 
 function PUSH_UP {
     echo -e '\x10' | dd of=${UP} bs=1 count=1
+## TODO
+#    while [ $? -ne 0 ]; do
+#        #  repeat
+#        echo -e '\x10' | dd of=${UP} bs=1 count=1
+#        sleep ${hold}
+#    done
+##
     sleep ${hold}
     echo -e '\x11' | dd of=${UP} bs=1 count=1
+## TODO
+#    while ! $?; do
+#        #  repeat
+#        echo -e '\x11' | dd of=${UP} bs=1 count=1
+#        sleep ${hold}
+#    done
+##
 }
 
 function MAKE_WARMER {
@@ -51,3 +65,5 @@ function UP_ON_TWO {
 # ============ MAIN =============
 
 MAKE_WARMER
+
+#UP_ON_TWO
