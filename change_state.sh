@@ -14,11 +14,11 @@ count=0
 # !!! CHANGE before run this script !!!
 begine_state=15
 # The temperature value to stop heating
-end_state=16
+end_state=26
 delta_state=`echo $((${end_state}-${begine_state}))`
 
 now_time=`date +%s`
-end_time=`date -d"2016-12-10 13:00:00" +%s`
+end_time=`date -d"2018-03-10 12:00:00" +%s`
 delta_time=`echo $((${end_time}-${now_time}))`
 
 time_sleep=$((${delta_time}/${delta_state}))
@@ -33,7 +33,7 @@ function _click {
     while [ $? -ne 0 ]; do
         sleep ${hold}
         if [ $count -eq 5 ]; then echo "ERROR !"; exit 1; fi
-        _click $1
+        _click ${_action} ${_device}
     done
 
 }
@@ -66,9 +66,9 @@ function MAKE_WARMER {
 function UP_ON_TWO {
 
     UP #wakeup
-    sleep 0.2
+    sleep 0.5
     UP # up to 1 C
-    sleep 0.2
+    sleep 0.5
     UP # up to 1 C
 
 }
