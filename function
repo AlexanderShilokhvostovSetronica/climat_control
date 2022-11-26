@@ -1,6 +1,42 @@
 function send_data() {
-    zabbix_sender -z 10.10.0.6 -s $1 -k $2 -o $3 2>&1 > /dev/null
+    zabbix_sender -z shilli.ru -s $1 -k $2 -o $3 2>&1 > /dev/null
 }
 function send_batch_data() {
-    zabbix_sender -z 10.10.0.6 -i $1 2>&1 >> ${log}
+    zabbix_sender -z shilli.ru -i $1 2>&1 >> ${log}
+}
+
+function get_current_temp() {
+    get_temp current_temp
+}
+
+function get_end_temp() {
+    get_temp end_temp
+}
+
+function get_temp() {
+    state=$1; shift
+    sqlite3 climat_control.db "select ${state} from climat_control;"
+}
+
+function increase_current_temp() {
+    current_temp=$(get_current_temp)
+    let current_temp+=1
+    set_current_temp ${current_temp}
+}
+
+function decrease_current_temp() {
+    current_temp=$(get_current_temp)
+    let current_temp-=1
+    set_current_temp ${current_temp}
+}
+
+function set_current_temp() {
+    temp=$1; shift
+    sqlite3 climat_control.db "update climat_control set current_temp=${temp}"
+}
+
+function set_temps() {
+    current_temp=$1; shift
+    end_temp=$1; shift
+    sqlite3 climat_control.db "update climat_control set current_temp=${current_temp}, end_temp=${end_temp}"
 }

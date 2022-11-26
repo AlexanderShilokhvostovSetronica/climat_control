@@ -13,7 +13,8 @@ zabbix_host="Morozovo"
 # Checking that only one instance is running
 if [ -e ${lockfile} ] && kill -0 `cat ${lockfile}`; then
     echo "already running" >> ${log}
-    exit
+    ./checking.sh
+    exit 0
 fi
 
 echo $$ > ${lockfile}
@@ -34,12 +35,15 @@ fi
 
 sensors=`for sensor in /sys/bus/w1/devices/28*; do basename ${sensor}; done`
 
-if [ ${#sensors[*]} -eq 0 ]; then
+if [ ${#sensors[*]} -gt 2 ]; then
     echo "Sensors not found" >> ${log}
     exit 0
 fi
 
 for sensor in ${sensors[*]}; do
+
+    if [ ! -f ${base_dir}/${sensor}/w1_slave ]; then echo "No sensor found for ${sensor}"; exit 1; fi
+
     alias=`grep ${sensor} ${aliases} | awk '{print $2}'`
     if [ -z ${alias} ]; then
         echo -e "${sensor}\t" >> ${aliases}
@@ -75,8 +79,8 @@ for sensor in ${sensors[*]}; do
         num=`wcalc -q ${num}${correction}`
     fi
 
-    if [ ${num%%.*} -le -40 -o ${num%%.*} -ge 90 ]; then
-        echo -e "Sensor: ${sensor}, Alias: ${alias}, Value: ${num}, not between -40 / +90, not push to zabbix" >> ${log}
+    if [ ${num%%.*} -le -50 -o ${num%%.*} -ge 100 ]; then
+        echo -e "Sensor: ${sensor}, Alias: ${alias}, Value: ${num}, not between -50 / +100, not push to zabbix" >> ${log}
         continue
     fi
 

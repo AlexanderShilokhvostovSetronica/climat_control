@@ -1,0 +1,6 @@
+function send_data() {
+    zabbix_sender -z 192.168.1.200 -s $1 -k $2 -o $3 2>&1 > /dev/null
+}
+function send_batch_data() {
+    zabbix_sender -z 192.168.1.200 -i $1 2>&1 >> ${log}
+}
